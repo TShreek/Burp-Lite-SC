@@ -1,10 +1,17 @@
 import http.server
 import socketserver
 import requests
+import os
+import json
+
 
 PROXY_PORT = 8080
 TARGET_HOST = 'localhost'
 TARGET_PORT = 5000
+
+
+LOG_PATH = os.path.join(os.path.dirname(__file__), '..', 'logs', 'traffic.json')
+
 
 class ProxyHandler(http.server.BaseHTTPRequestHandler):
     def do_GET(self):
@@ -51,6 +58,22 @@ def run():
     with socketserver.ThreadingTCPServer(("", PROXY_PORT), ProxyHandler) as httpd:
         print(f"[*] Proxy running on port {PROXY_PORT} → forwarding to http://{TARGET_HOST}:{TARGET_PORT}")
         httpd.serve_forever()
+
+def log_to_file(self, method, path, headers, request_body, response):
+    log_entry = {
+        "method": method,
+        "path": path,
+        "request_headers": dict(headers),
+        "request_body": request_body.decode() if request_body else None,
+        "response_code": response.status_code,
+        "response_body": response.text
+    }
+
+    os.makedirs(os.path.dirname(LOG_PATH), exist_ok=True)
+
+    with open(LOG_PATH, 'a') as f:
+        f.write(json.dumps(log_entry, indent=2))
+        f.write(",\n")  # Add comma for readability (not perfect JSON array)
 
 if __name__ == "__main__":
     run()

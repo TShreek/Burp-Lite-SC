@@ -226,17 +226,34 @@ pre {
     color: white;
 }
 
-.load-button {
+.button-group {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    margin: 10px 0;
+}
+
+.load-button, .clear-button {
     padding: 10px;
-    background-color: var(--accent-color);
     color: white;
     border: none;
     border-radius: 4px;
     cursor: pointer;
-    margin: 10px 0;
-    width: 100%;
+    flex: 1;
 }
 
-.load-button:hover {
+.load-button {
+    background-color: var(--accent-color);
+}
+
+.clear-button {
+    background-color: #555;
+}
+
+.load-button:hover, .clear-button:hover {
     opacity: 0.9;
+}
+
+.clear-button:hover {
+    background-color: var(--error);
 }

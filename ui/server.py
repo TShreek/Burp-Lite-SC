@@ -7,16 +7,28 @@ import json
 import http.server
 import socketserver
 import sys
+import argparse
 from urllib.parse import urlparse, parse_qs
-from scanner.passive import scan_traffic_file
 
 # Add project root to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+# Now we can import the scanner after adding the path
+try:
+    from scanner.passive import scan_traffic_file
+except ImportError:
+    # Fallback function if scanner module can't be imported
+    def scan_traffic_file(file_path):
+        print("Warning: scanner.passive module not found. Scanner functionality disabled.")
+        return []
 
 UI_PORT = 8081
 UI_DIR = os.path.dirname(os.path.abspath(__file__))
 LOGS_DIR = os.path.join(os.path.dirname(UI_DIR), 'logs')
 TRAFFIC_FILE = os.path.join(LOGS_DIR, 'traffic.json')
+
+# Create logs directory if it doesn't exist
+os.makedirs(LOGS_DIR, exist_ok=True)
 
 class UIHandler(http.server.SimpleHTTPRequestHandler):
     def __init__(self, *args, **kwargs):
@@ -30,6 +42,8 @@ class UIHandler(http.server.SimpleHTTPRequestHandler):
             self.serve_json_file(TRAFFIC_FILE)
         elif parsed_path.path == '/api/scan':
             self.serve_scan_results()
+        elif parsed_path.path == '/api/clear':
+            self.clear_traffic_file()
         # Access to logs directory
         elif parsed_path.path.startswith('/logs/'):
             requested_file = os.path.join(
@@ -44,19 +58,36 @@ class UIHandler(http.server.SimpleHTTPRequestHandler):
     def serve_json_file(self, file_path):
         """Serve a JSON file with proper content type"""
         if not os.path.exists(file_path):
-            self.send_error(404, "File not found")
+            # Return empty JSON array if file doesn't exist yet
+            empty_json = b'[]'
+            self.send_response(200)
+            self.send_header('Content-Type', 'application/json')
+            self.send_header('Content-Length', str(len(empty_json)))
+            self.send_header('Access-Control-Allow-Origin', '*')  # Allow CORS
+            self.end_headers()
+            self.wfile.write(empty_json)
             return
             
         try:
             with open(file_path, 'rb') as f:
-                content = f.read()
+                content = f.read() or b'[]'  # Default to empty array if file is empty
+                
+            # Check if content is valid JSON
+            try:
+                json.loads(content)
+            except json.JSONDecodeError:
+                # If invalid JSON, return empty array
+                content = b'[]'
                 
             self.send_response(200)
             self.send_header('Content-Type', 'application/json')
             self.send_header('Content-Length', str(len(content)))
+            self.send_header('Cache-Control', 'no-cache, no-store')  # Prevent caching
+            self.send_header('Access-Control-Allow-Origin', '*')  # Allow CORS
             self.end_headers()
             self.wfile.write(content)
         except Exception as e:
+            print(f"Error serving JSON file: {e}")
             self.send_error(500, str(e))
     
     def serve_file(self, file_path):
@@ -111,13 +142,69 @@ class UIHandler(http.server.SimpleHTTPRequestHandler):
         self.send_header('Content-Length', str(len(json_data)))
         self.end_headers()
         self.wfile.write(json_data)
+        
+    def clear_traffic_file(self):
+        """Clear the traffic.json file"""
+        try:
+            # Create an empty JSON array file
+            with open(TRAFFIC_FILE, 'w') as f:
+                f.write('[]')
+            
+            # Log the action
+            print(f"[*] Traffic log file cleared: {TRAFFIC_FILE}")
+            
+            # Return success response
+            self.send_json_response({
+                "status": "success", 
+                "message": "Traffic log file cleared successfully"
+            })
+        except Exception as e:
+            print(f"[!] Error clearing traffic log: {e}")
+            self.send_error(500, f"Error clearing traffic log: {str(e)}")
 
 
 def run():
-    with socketserver.ThreadingTCPServer(("", UI_PORT), UIHandler) as httpd:
-        print(f"[*] UI Server running on http://localhost:{UI_PORT}")
-        print(f"[*] Open http://localhost:{UI_PORT}/dashboard.html in your browser")
-        httpd.serve_forever()
+    try:
+        # Allow the socket to be reused immediately after the server is stopped
+        socketserver.TCPServer.allow_reuse_address = True
+        
+        with socketserver.ThreadingTCPServer(("", UI_PORT), UIHandler) as httpd:
+            print(f"[*] UI Server running on http://localhost:{UI_PORT}")
+            print(f"[*] Open http://localhost:{UI_PORT}/index.html in your browser")
+            print(f"[*] Press Ctrl+C to stop the server")
+            httpd.serve_forever()
+    except OSError as e:
+        if e.errno == 48:  # Address already in use
+            print(f"\n[!] Error: Port {UI_PORT} is already in use.")
+            print(f"[!] Either another instance of the server is running or the port wasn't released properly.")
+            print(f"[!] Try the following:")
+            print(f"    1. Wait a moment and try again")
+            print(f"    2. Kill the process: sudo lsof -i :{UI_PORT} and then sudo kill <PID>")
+            print(f"    3. Or use a different port: UI_PORT = {UI_PORT+1} (line 16 in this file)")
+            sys.exit(1)
+        else:
+            raise
+    except KeyboardInterrupt:
+        print("\n[*] Server shutdown requested...")
+        print("[*] Server stopped. Thank you for using Burp-Lite!")
+        sys.exit(0)
+
+def main():
+    """Entry point for the UI server"""
+    global UI_PORT
+    
+    # Parse command line arguments
+    parser = argparse.ArgumentParser(description="Burp-Lite UI Server")
+    parser.add_argument("-p", "--port", type=int, default=UI_PORT,
+                        help=f"Port to run the UI server on (default: {UI_PORT})")
+    args = parser.parse_args()
+    
+    # Override the UI_PORT if specified via command line
+    if args.port != UI_PORT:
+        UI_PORT = args.port
+        print(f"[*] Using custom port: {UI_PORT}")
+    
+    run()
 
 if __name__ == "__main__":
-    run()
+    main()

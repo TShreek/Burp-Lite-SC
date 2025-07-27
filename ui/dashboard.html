@@ -255,12 +255,14 @@
             <div class="logo"><span class="shield-icon">🛡️</span>Burp-Lite Dashboard</div>
         </header>
         
-        <div class="traffic-list">
-            <button id="loadTraffic" class="load-button">Load Traffic</button>
-            <div id="trafficItems">
-                <div class="no-data">No traffic data loaded yet</div>
-            </div>
-        </div>
+       <div class="traffic-list">
+    <input id="searchBox" type="text" placeholder="Search traffic..." style="width: 100%; padding: 8px; margin-bottom: 10px;" />
+    <button id="loadTraffic" class="load-button">Load Traffic</button>
+    <div id="trafficItems">
+        <div class="no-data">No traffic data loaded yet</div>
+    </div>
+</div>
+
         
         <div class="detail-view">
             <div id="detailHeader">
@@ -293,7 +295,8 @@
         let selectedTraffic = null;
         
         document.getElementById('loadTraffic').addEventListener('click', loadTrafficData);
-        
+       document.getElementById('searchBox').addEventListener('input', updateTrafficList);
+ 
         // Tab switching logic
         document.querySelectorAll('.tab').forEach(tab => {
             tab.addEventListener('click', () => {
@@ -330,34 +333,53 @@
         }
 
         function updateTrafficList() {
-            const trafficList = document.getElementById('trafficItems');
-            if (!trafficData || trafficData.length === 0) {
-                trafficList.innerHTML = '<div class="no-data">No traffic data available</div>';
-                return;
+    const trafficList = document.getElementById('trafficItems');
+    const searchText = document.getElementById('searchBox').value.toLowerCase();
+
+    if (!trafficData || trafficData.length === 0) {
+        trafficList.innerHTML = '<div class="no-data">No traffic data available</div>';
+        return;
+    }
+
+    trafficList.innerHTML = '';
+    let matchFound = false;
+
+    trafficData.forEach((item, index) => {
+        const fullText = JSON.stringify(item).toLowerCase();
+        if (!searchText || fullText.includes(searchText)) {
+            matchFound = true;
+            const trafficItem = document.createElement('div');
+            trafficItem.className = 'traffic-item';
+            trafficItem.dataset.index = index;
+
+            const methodClass = `method-${item.method}`;
+            const statusClass = `status-${Math.floor(item.response_code / 100)}xx`;
+
+            trafficItem.innerHTML = `
+                <span class="method ${methodClass}">${item.method}</span>
+                <span class="status-code ${statusClass}">${item.response_code}</span>
+                <span class="path">${item.path}</span>
+            `;
+
+            // Highlight suspicious content
+            const bodyString = JSON.stringify(item.request_body || '').toLowerCase();
+            if (bodyString.includes('password') || bodyString.includes('eyj')) {
+                trafficItem.style.backgroundColor = '#4a1c1c'; // deep red
             }
-            
-            trafficList.innerHTML = '';
-            trafficData.forEach((item, index) => {
-                const trafficItem = document.createElement('div');
-                trafficItem.className = 'traffic-item';
-                trafficItem.dataset.index = index;
-                
-                const methodClass = `method-${item.method}`;
-                const statusClass = `status-${Math.floor(item.response_code/100)}xx`;
-                
-                trafficItem.innerHTML = `
-                    <span class="method ${methodClass}">${item.method}</span>
-                    <span class="status-code ${statusClass}">${item.response_code}</span>
-                    <span class="path">${item.path}</span>
-                `;
-                
-                trafficItem.addEventListener('click', () => {
-                    selectTraffic(index);
-                });
-                
-                trafficList.appendChild(trafficItem);
+
+            trafficItem.addEventListener('click', () => {
+                selectTraffic(index);
             });
+
+            trafficList.appendChild(trafficItem);
         }
+    });
+
+    if (!matchFound) {
+        trafficList.innerHTML = '<div class="no-data">No matches found for your search.</div>';
+    }
+}
+
 
         function selectTraffic(index) {
             // Clear previous selection

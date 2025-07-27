@@ -1,0 +1,7 @@
+# Core dependencies
+flask==2.0.1
+requests==2.26.0
+
+# Development dependencies
+black==21.9b0
+pytest==6.2.5

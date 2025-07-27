@@ -3,6 +3,7 @@ import socketserver
 import requests
 import os
 import json
+import datetime
 
 
 PROXY_PORT = 8080
@@ -43,9 +44,18 @@ class ProxyHandler(http.server.BaseHTTPRequestHandler):
             # Log response
             print("[<] Response Code:", response.status_code)
             print("[<] Response Body:", response.text)
+            
+            # Log the traffic to file
+            self.log_to_file(self.command, self.path, headers, body, response)
 
             # Send back the response
             self.send_response(response.status_code)
+            # Add security headers for our responses to demo the scanner
+            self.send_header('X-Content-Type-Options', 'nosniff')
+            # Deliberately omit some security headers to demonstrate the scanner
+            # self.send_header('Content-Security-Policy', "default-src 'self'")
+            # self.send_header('X-Frame-Options', 'DENY')
+            
             for key, value in response.headers.items():
                 self.send_header(key, value)
             self.end_headers()
@@ -54,26 +64,41 @@ class ProxyHandler(http.server.BaseHTTPRequestHandler):
         except Exception as e:
             self.send_error(502, f"Proxy error: {e}")
 
+    def log_to_file(self, method, path, headers, request_body, response):
+        log_entry = {
+            "method": method,
+            "path": path,
+            "request_headers": dict(headers),
+            "request_body": request_body.decode() if request_body else None,
+            "response_code": response.status_code,
+            "response_headers": dict(response.headers),
+            "response_body": response.text,
+            "timestamp": datetime.datetime.now().isoformat()
+        }
+
+        os.makedirs(os.path.dirname(LOG_PATH), exist_ok=True)
+
+        # Initialize JSON file if it doesn't exist or is empty
+        if not os.path.exists(LOG_PATH) or os.path.getsize(LOG_PATH) == 0:
+            with open(LOG_PATH, 'w') as f:
+                f.write('[\n')
+                f.write(json.dumps(log_entry, indent=2))
+                f.write('\n]')
+        else:
+            # Read existing content, remove the closing bracket, add new entry
+            with open(LOG_PATH, 'r') as f:
+                content = f.read().rstrip().rstrip(']')
+            
+            with open(LOG_PATH, 'w') as f:
+                f.write(content)
+                f.write(',\n')
+                f.write(json.dumps(log_entry, indent=2))
+                f.write('\n]')
+
 def run():
     with socketserver.ThreadingTCPServer(("", PROXY_PORT), ProxyHandler) as httpd:
         print(f"[*] Proxy running on port {PROXY_PORT} → forwarding to http://{TARGET_HOST}:{TARGET_PORT}")
         httpd.serve_forever()
-
-def log_to_file(self, method, path, headers, request_body, response):
-    log_entry = {
-        "method": method,
-        "path": path,
-        "request_headers": dict(headers),
-        "request_body": request_body.decode() if request_body else None,
-        "response_code": response.status_code,
-        "response_body": response.text
-    }
-
-    os.makedirs(os.path.dirname(LOG_PATH), exist_ok=True)
-
-    with open(LOG_PATH, 'a') as f:
-        f.write(json.dumps(log_entry, indent=2))
-        f.write(",\n")  # Add comma for readability (not perfect JSON array)
 
 if __name__ == "__main__":
     run()

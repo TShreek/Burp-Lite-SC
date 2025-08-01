@@ -22,6 +22,9 @@ class PassiveScanner:
         self._check_x_frame_options(traffic_entry)
         self._check_secure_cookies(traffic_entry)
         self._check_for_sensitive_info(traffic_entry)
+        self._check_x_content_type_options(traffic_entry)
+        self._check_server_header(traffic_entry)
+
         
         return self.findings
     
@@ -132,6 +135,35 @@ def scan_traffic_file(file_path: str) -> List[Dict[str, Any]]:
     except (json.JSONDecodeError, FileNotFoundError) as e:
         print(f"Error scanning traffic file: {e}")
         return []
+def _check_x_content_type_options(self, traffic: Dict[str, Any]) -> None:
+    """Check if X-Content-Type-Options header is missing"""
+    if 'response_headers' not in traffic:
+        return
+
+    headers = {k.lower(): v for k, v in traffic['response_headers'].items()}
+    if 'x-content-type-options' not in headers:
+        self.findings.append({
+            'severity': 'Low',
+            'title': 'Missing X-Content-Type-Options Header',
+            'description': 'The X-Content-Type-Options header is missing. This header helps prevent MIME-sniffing attacks.',
+            'url': traffic.get('path', 'Unknown'),
+            'remediation': 'Add X-Content-Type-Options header with value nosniff.'
+        })
+def _check_server_header(self, traffic: Dict[str, Any]) -> None:
+    """Warn if Server header leaks backend details"""
+    if 'response_headers' not in traffic:
+        return
+
+    headers = {k.lower(): v for k, v in traffic['response_headers'].items()}
+    server = headers.get('server')
+    if server and any(keyword in server.lower() for keyword in ['apache', 'nginx', 'iis']):
+        self.findings.append({
+            'severity': 'Low',
+            'title': 'Server Header Disclosure',
+            'description': f'The Server header exposes backend details: {server}',
+            'url': traffic.get('path', 'Unknown'),
+            'remediation': 'Omit or mask the Server header to reduce fingerprinting.'
+        })
 
 
 if __name__ == "__main__":

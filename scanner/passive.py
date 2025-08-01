@@ -164,6 +164,31 @@ def _check_server_header(self, traffic: Dict[str, Any]) -> None:
             'url': traffic.get('path', 'Unknown'),
             'remediation': 'Omit or mask the Server header to reduce fingerprinting.'
         })
+def _check_authenticated_traffic(self, traffic: Dict[str, Any]) -> None:
+    """Detect traffic that uses authentication headers or session cookies"""
+    auth_headers = traffic.get('request_headers', {})
+    headers = {k.lower(): v for k, v in auth_headers.items()}
+
+    indicators = []
+
+    # Look for Authorization header
+    if 'authorization' in headers:
+        indicators.append('Authorization Header')
+
+    # Look for common session cookies
+    cookie_header = headers.get('cookie', '')
+    if any(token in cookie_header.lower() for token in ['session', 'auth', 'jwt']):
+        indicators.append('Session Cookie')
+
+    if indicators:
+        self.findings.append({
+            'severity': 'Info',
+            'title': 'Authenticated Request Detected',
+            'description': f'This request contains: {", ".join(indicators)}. Ensure proper access controls and session handling.',
+            'url': traffic.get('path', 'Unknown'),
+            'remediation': 'Ensure authenticated requests follow least privilege and sensitive data is encrypted.'
+        })
+    
 
 
 if __name__ == "__main__":

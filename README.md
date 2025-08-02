@@ -6,28 +6,7 @@ A lightweight HTTP intercepting proxy that logs requests and responses, and pass
 ![Flask](https://img.shields.io/badge/Flask-2.0+-green.svg)
 ![License](https://img.shields.io/badge/License-MIT-yellow.svg)
 
-## 🚀 Quick Start
-
-```bash
-# Install dependencies
-pip install -r requirements.txt
-
-# Terminal 1: Start Flask backend
-python3 flask_app/app.py
-
-# Terminal 2: Start proxy server
-python3 proxy/server.py
-
-# Terminal 3: Start UI server (optional, for web interface)
-python3 ui/server.py
-
-# Terminal 4: Generate test traffic
-python3 test_client/run_test.py
-```
-
-Traffic will be intercepted and logged to `logs/traffic.json`. View the web interface at http://localhost:8081/index.html
-
-## 📋 Project Overview
+##  Project Overview
 
 Burp-Lite is a Python-based HTTP proxy designed for learning, research, and demo purposes. It acts as a man-in-the-middle between a client and server, allowing you to:
 
@@ -50,7 +29,7 @@ It's ideal for:
 - 👨‍💻 **Security engineers**
 - 💼 **Interview/demo portfolios**
 
-## 🔄 Architecture Flow
+## � Architecture Flow
 
 ```
 Client (curl or browser)
@@ -64,6 +43,29 @@ Proxy logs & scanner runs
 Response back to client
 ```
 
+## 🚀 Quick Start
+
+```bash
+# Install dependencies
+pip install -r requirements.txt
+
+# Terminal 1: Start Flask backend
+python3 flask_app/app.py
+
+# Terminal 2: Start proxy server
+python3 proxy/server.py
+
+# Terminal 3: Start UI server
+python3 ui/server.py
+# If port 8081 is already in use, specify a different port:
+# python3 ui/server.py --port 8082
+
+# Terminal 4: Generate test traffic
+python3 test_client/run_test.py
+```
+
+View your intercepted traffic at [http://localhost:8081/index.html](http://localhost:8081/index.html)
+
 ## ✨ Features
 
 | Feature | Status | Description |
@@ -76,7 +78,7 @@ Response back to client
 | Request/Response Tampering | 🔜 | Modify requests on-the-fly |
 | HTTPS/TLS Interception | 🔜 | Support for HTTPS traffic |
 
-## 🚀 How to Run
+## � How to Run
 
 ### 1. Clone this repository
 ```bash
@@ -144,7 +146,7 @@ python3 scanner/passive.py
 ```
 The scanner results will also appear in the web dashboard for each request.
 
-## 📁 Folder Structure
+## 📁 Project Structure
 
 ```
 Burp-Lite-with-Scanner/
@@ -211,7 +213,7 @@ The scanner currently checks for:
 - Structure a vulnerability scanning system
 - Create a web interface for security tools
 
-## 📜 License
+## � License
 MIT License. Use for learning and ethical purposes only.
 
 ## 🙏 Credits

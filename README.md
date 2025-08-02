@@ -6,14 +6,16 @@ A lightweight HTTP intercepting proxy that logs requests and responses, and pass
 ![Flask](https://img.shields.io/badge/Flask-2.0+-green.svg)
 ![License](https://img.shields.io/badge/License-MIT-yellow.svg)
 
-##  Project Overview
+## 📋 Project Overview
 
 Burp-Lite is a Python-based HTTP proxy designed for learning, research, and demo purposes. It acts as a man-in-the-middle between a client and server, allowing you to:
 
-- 🔍 **Intercept HTTP traffic**
-- 📝 **Log requests and responses**
+- 🔍 **Intercept HTTP traffic** (GET/POST requests)
+- 📝 **Log requests and responses** with timestamps
 - 🔒 **Analyze traffic for common security misconfigurations**
 - 🧩 **Build your own scanning rules**
+- 🌐 **Visualize traffic in a web dashboard**
+- 🧹 **Clear traffic logs** with a single click
 
 ## 🤔 Why This Project?
 
@@ -66,15 +68,28 @@ python3 test_client/run_test.py
 
 View your intercepted traffic at [http://localhost:8081/index.html](http://localhost:8081/index.html)
 
+The dashboard provides:
+- Real-time traffic monitoring
+- Detailed request/response analysis
+- Security findings visualization
+- Traffic log clearing
+
 ## ✨ Features
 
 | Feature | Status | Description |
 |---------|--------|-------------|
-| HTTP Intercepting Proxy | ✅ | Intercepts and forwards HTTP requests |
-| Traffic Logging | ✅ | Logs to console and logs/traffic.json in structured format |
+| HTTP Intercepting Proxy | ✅ | Intercepts and forwards HTTP requests (GET/POST) |
+| Traffic Logging | ✅ | Logs to console and logs/traffic.json in structured format with timestamps |
+| JSON-based Storage | ✅ | Traffic data stored in a structured JSON format for easy analysis |
+| Traffic Visualization | ✅ | View request/response details, headers, and body content in the dashboard |
 | Passive Vulnerability Scanner | ✅ | Analyzes traffic for security issues (headers, sensitive data) |
+| Security Headers Detection | ✅ | Detects missing Content-Security-Policy, X-Frame-Options, and other security headers |
+| Sensitive Data Detection | ✅ | Identifies potentially sensitive information in responses (credit cards, API keys, etc.) |
+| Traffic History Clearing | ✅ | Clear button to reset traffic logs from the UI or API |
+| Web Dashboard | ✅ | Interactive web interface to review traffic and security findings |
+| API Endpoints | ✅ | RESTful API for traffic data, scan results, and log management |
 | Test Client | ✅ | Simulates traffic for testing and demonstration |
-| Web Dashboard | ✅ | View traffic and security findings in a browser interface |
+| Port Conflict Handling | ✅ | Command-line options to handle port conflicts |
 | Request/Response Tampering | 🔜 | Modify requests on-the-fly |
 | HTTPS/TLS Interception | 🔜 | Support for HTTPS traffic |
 
@@ -101,7 +116,11 @@ You should see a message indicating the Flask app is running on port 5000.
 ```bash
 python3 proxy/server.py
 ```
-This will start the proxy on port 8080 that forwards requests to the Flask app.
+This will start the proxy on port 8080 that forwards requests to the Flask app. The proxy:
+- Intercepts HTTP GET and POST requests
+- Forwards them to the target application
+- Logs all traffic with timestamps
+- Deliberately omits some security headers for scanner demonstration
 
 ### 5. Start the UI server (in a third terminal)
 ```bash
@@ -136,10 +155,20 @@ A. **Web Dashboard**: Open your browser to [http://localhost:8081/index.html](ht
    - Click "Load Traffic" to refresh the view
    - Click on any request to see details
    - Click "Clear All" to reset the traffic log file
+   - Security findings are displayed for each request
+   - View complete request/response headers and bodies
    
 B. **Command Line**: The proxy will log all traffic to the console
 
-### 8. Run the scanner (optional)
+### 8. API Access (for developers)
+The UI server provides several API endpoints:
+```
+/api/traffic         - Returns all logged traffic as JSON
+/api/scan            - Returns scanner findings
+/api/clear           - Clears the traffic log file
+```
+
+### 9. Run the scanner (optional)
 To analyze the captured traffic for security issues:
 ```bash
 python3 scanner/passive.py
@@ -200,10 +229,13 @@ Burp-Lite-with-Scanner/
 
 The scanner currently checks for:
 
-- 🚫 Missing Content-Security-Policy
-- 🚫 Missing X-Frame-Options
-- 🔑 Insecure Set-Cookie flags (Secure, HttpOnly)
-- 🔒 Potential sensitive information disclosure
+- 🚫 Missing Content-Security-Policy header
+- 🚫 Missing X-Frame-Options header
+- 🚫 Missing X-Content-Type-Options header
+- 🔑 Insecure Set-Cookie flags (missing Secure, HttpOnly)
+- 🔒 Potential sensitive information disclosure (credit cards, API keys, emails)
+- 🖥️ Server header information leakage
+- 🔐 Authentication method detection
 
 ## 🎓 Learning Outcomes
 

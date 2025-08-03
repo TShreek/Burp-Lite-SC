@@ -33,6 +33,14 @@ os.makedirs(LOGS_DIR, exist_ok=True)
 class UIHandler(http.server.SimpleHTTPRequestHandler):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, directory=UI_DIR, **kwargs)
+
+    def perform_active_scan(self):
+        from scanner.active import ActiveScanner
+
+        scanner = ActiveScanner()
+        results = scanner.scan(base_url="http://localhost:5000", method="GET", path="/send", headers={})
+        self.send_json_response({"findings": results})
+
     
     def do_GET(self):
         parsed_path = urlparse(self.path)
@@ -51,6 +59,9 @@ class UIHandler(http.server.SimpleHTTPRequestHandler):
                 parsed_path.path[1:]  # Remove leading slash
             )
             self.serve_file(requested_file)
+        elif parsed_path.path == '/api/active_scan':
+            self.perform_active_scan()
+
         else:
             # Default to serving files from UI directory
             super().do_GET()
@@ -205,6 +216,7 @@ def main():
         print(f"[*] Using custom port: {UI_PORT}")
     
     run()
+
 
 if __name__ == "__main__":
     main()

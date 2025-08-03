@@ -233,7 +233,7 @@ pre {
     margin: 10px 0;
 }
 
-.load-button, .clear-button {
+.load-button, .clear-button, .btn {
     padding: 10px;
     color: white;
     border: none;
@@ -250,7 +250,11 @@ pre {
     background-color: #555;
 }
 
-.load-button:hover, .clear-button:hover {
+.btn-danger {
+    background-color: var(--error);
+}
+
+.load-button:hover, .clear-button:hover, .btn:hover {
     opacity: 0.9;
 }
 

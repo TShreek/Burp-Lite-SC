@@ -1,0 +1,31 @@
+[
+  {
+    "method": "GET",
+    "path": "/api/test",
+    "request_headers": {
+      "Host": "example.com",
+      "User-Agent": "TestClient/1.0"
+    },
+    "request_body": "",
+    "response_code": 200,
+    "response_headers": {
+      "Content-Type": "text/html",
+      "Set-Cookie": "sessionId=abc123"
+    },
+    "response_body": "<html><body>Hello World</body></html>"
+  },
+  {
+    "method": "POST",
+    "path": "/api/login",
+    "request_headers": {
+      "Host": "example.com",
+      "Content-Type": "application/json"
+    },
+    "request_body": "{\"username\":\"admin\",\"password\":\"admin123\"}",
+    "response_code": 302,
+    "response_headers": {
+      "Location": "/dashboard"
+    },
+    "response_body": ""
+  }
+]

@@ -274,3 +274,33 @@ function formatBody(body) {
         return body;
     }
 }
+document.getElementById('activeScanBtn').addEventListener('click', () => {
+  const resultsContainer = document.getElementById('results');
+  resultsContainer.innerHTML = '<p class="loading">🔍 Running Active Scan...</p>';
+
+  fetch('/api/active_scan')
+    .then(response => response.json())
+    .then(data => {
+      resultsContainer.innerHTML = '';
+      if (data.findings && data.findings.length > 0) {
+        data.findings.forEach(finding => {
+          const div = document.createElement('div');
+          div.className = 'finding';
+          div.innerHTML = `
+            <strong>${finding.title}</strong><br/>
+            <span class="severity ${finding.severity.toLowerCase()}">${finding.severity}</span><br/>
+            <em>${finding.url}</em><br/>
+            <p>${finding.description}</p>
+            <code>${finding.remediation}</code>
+          `;
+          resultsContainer.appendChild(div);
+        });
+      } else {
+        resultsContainer.innerHTML = '<p class="no-findings">✅ No issues found during active scan.</p>';
+      }
+    })
+    .catch(error => {
+      resultsContainer.innerHTML = `<p class="error">⚠️ Error running active scan: ${error.message}</p>`;
+    });
+});
+

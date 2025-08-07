@@ -28,6 +28,7 @@ env/
 
 # Logs
 logs/traffic.json
+logs/*.log
 
 # IDE files
 .idea/

@@ -28,4 +28,400 @@
     },
     "response_body": ""
   }
+,
+{
+  "method": "POST",
+  "path": "/send",
+  "request_headers": {
+    "Host": "localhost:8080",
+    "User-Agent": "python-requests/2.26.0",
+    "Accept-Encoding": "gzip, deflate",
+    "Accept": "*/*",
+    "Connection": "keep-alive",
+    "Content-Type": "application/json",
+    "Content-Length": "92"
+  },
+  "request_body": "{\"from\": \"charlie\", \"to\": \"eve\", \"message\": \"This message will be intercepted by Burp-Lite\"}",
+  "response_code": 200,
+  "response_headers": {
+    "Content-Type": "application/json",
+    "Content-Length": "125",
+    "Server": "Werkzeug/2.0.1 Python/3.13.1",
+    "Date": "Thu, 07 Aug 2025 10:52:11 GMT"
+  },
+  "response_body": "{\"data\":{\"from\":\"charlie\",\"message\":\"This message will be intercepted by Burp-Lite\",\"to\":\"eve\"},\"status\":\"Message received\"}\n",
+  "timestamp": "2025-08-07T16:22:11.171532"
+}
+,
+{
+  "method": "POST",
+  "path": "/send",
+  "request_headers": {
+    "Host": "localhost:8080",
+    "User-Agent": "python-requests/2.26.0",
+    "Accept-Encoding": "gzip, deflate",
+    "Accept": "*/*",
+    "Connection": "keep-alive",
+    "Content-Type": "application/json",
+    "Content-Length": "61"
+  },
+  "request_body": "{\"from\": \"bob\", \"to\": \"eve\", \"message\": \"How are you doing?\"}",
+  "response_code": 200,
+  "response_headers": {
+    "Content-Type": "application/json",
+    "Content-Length": "94",
+    "Server": "Werkzeug/2.0.1 Python/3.13.1",
+    "Date": "Thu, 07 Aug 2025 10:52:11 GMT"
+  },
+  "response_body": "{\"data\":{\"from\":\"bob\",\"message\":\"How are you doing?\",\"to\":\"eve\"},\"status\":\"Message received\"}\n",
+  "timestamp": "2025-08-07T16:22:11.686318"
+}
+,
+{
+  "method": "POST",
+  "path": "/send",
+  "request_headers": {
+    "Host": "localhost:8080",
+    "User-Agent": "python-requests/2.26.0",
+    "Accept-Encoding": "gzip, deflate",
+    "Accept": "*/*",
+    "Connection": "keep-alive",
+    "Content-Type": "application/json",
+    "Content-Length": "77"
+  },
+  "request_body": "{\"from\": \"dave\", \"to\": \"alice\", \"message\": \"Security testing in progress...\"}",
+  "response_code": 200,
+  "response_headers": {
+    "Content-Type": "application/json",
+    "Content-Length": "110",
+    "Server": "Werkzeug/2.0.1 Python/3.13.1",
+    "Date": "Thu, 07 Aug 2025 10:52:12 GMT"
+  },
+  "response_body": "{\"data\":{\"from\":\"dave\",\"message\":\"Security testing in progress...\",\"to\":\"alice\"},\"status\":\"Message received\"}\n",
+  "timestamp": "2025-08-07T16:22:12.197393"
+}
+,
+{
+  "method": "POST",
+  "path": "/send",
+  "request_headers": {
+    "Host": "localhost:8080",
+    "User-Agent": "python-requests/2.26.0",
+    "Accept-Encoding": "gzip, deflate",
+    "Accept": "*/*",
+    "Connection": "keep-alive",
+    "Content-Type": "application/json",
+    "Content-Length": "87"
+  },
+  "request_body": "{\"from\": \"bob\", \"to\": \"eve\", \"message\": \"API key for testing: sk_test_abcdef123456789\"}",
+  "response_code": 200,
+  "response_headers": {
+    "Content-Type": "application/json",
+    "Content-Length": "120",
+    "Server": "Werkzeug/2.0.1 Python/3.13.1",
+    "Date": "Thu, 07 Aug 2025 10:52:12 GMT"
+  },
+  "response_body": "{\"data\":{\"from\":\"bob\",\"message\":\"API key for testing: sk_test_abcdef123456789\",\"to\":\"eve\"},\"status\":\"Message received\"}\n",
+  "timestamp": "2025-08-07T16:22:12.712213"
+}
+,
+{
+  "method": "POST",
+  "path": "/send",
+  "request_headers": {
+    "Host": "localhost:8080",
+    "User-Agent": "python-requests/2.26.0",
+    "Accept-Encoding": "gzip, deflate",
+    "Accept": "*/*",
+    "Connection": "keep-alive",
+    "Content-Type": "application/json",
+    "Content-Length": "67"
+  },
+  "request_body": "{\"from\": \"alice\", \"to\": \"charlie\", \"message\": \"How are you doing?\"}",
+  "response_code": 200,
+  "response_headers": {
+    "Content-Type": "application/json",
+    "Content-Length": "100",
+    "Server": "Werkzeug/2.0.1 Python/3.13.1",
+    "Date": "Thu, 07 Aug 2025 10:52:13 GMT"
+  },
+  "response_body": "{\"data\":{\"from\":\"alice\",\"message\":\"How are you doing?\",\"to\":\"charlie\"},\"status\":\"Message received\"}\n",
+  "timestamp": "2025-08-07T16:22:13.223972"
+}
+,
+{
+  "method": "POST",
+  "path": "/send",
+  "request_headers": {
+    "Host": "localhost:8080",
+    "User-Agent": "python-requests/2.26.0",
+    "Accept-Encoding": "gzip, deflate",
+    "Accept": "*/*",
+    "Connection": "keep-alive",
+    "Content-Type": "application/json",
+    "Content-Length": "62"
+  },
+  "request_body": "{\"from\": \"eve\", \"to\": \"dave\", \"message\": \"How are you doing?\"}",
+  "response_code": 200,
+  "response_headers": {
+    "Content-Type": "application/json",
+    "Content-Length": "95",
+    "Server": "Werkzeug/2.0.1 Python/3.13.1",
+    "Date": "Thu, 07 Aug 2025 10:52:13 GMT"
+  },
+  "response_body": "{\"data\":{\"from\":\"eve\",\"message\":\"How are you doing?\",\"to\":\"dave\"},\"status\":\"Message received\"}\n",
+  "timestamp": "2025-08-07T16:22:13.733623"
+}
+,
+{
+  "method": "POST",
+  "path": "/send",
+  "request_headers": {
+    "Host": "localhost:8080",
+    "User-Agent": "python-requests/2.26.0",
+    "Accept-Encoding": "gzip, deflate",
+    "Accept": "*/*",
+    "Connection": "keep-alive",
+    "Content-Type": "application/json",
+    "Content-Length": "94"
+  },
+  "request_body": "{\"from\": \"dave\", \"to\": \"eve\", \"message\": \"My credit card is 4111-1111-1111-1111 (not really)\"}",
+  "response_code": 200,
+  "response_headers": {
+    "Content-Type": "application/json",
+    "Content-Length": "127",
+    "Server": "Werkzeug/2.0.1 Python/3.13.1",
+    "Date": "Thu, 07 Aug 2025 10:52:14 GMT"
+  },
+  "response_body": "{\"data\":{\"from\":\"dave\",\"message\":\"My credit card is 4111-1111-1111-1111 (not really)\",\"to\":\"eve\"},\"status\":\"Message received\"}\n",
+  "timestamp": "2025-08-07T16:22:14.253397"
+}
+,
+{
+  "method": "POST",
+  "path": "/send",
+  "request_headers": {
+    "Host": "localhost:8080",
+    "User-Agent": "python-requests/2.26.0",
+    "Accept-Encoding": "gzip, deflate",
+    "Accept": "*/*",
+    "Connection": "keep-alive",
+    "Content-Type": "application/json",
+    "Content-Length": "105"
+  },
+  "request_body": "{\"from\": \"eve\", \"to\": \"charlie\", \"message\": \"This is a confidential message with password: MySecret123!\"}",
+  "response_code": 200,
+  "response_headers": {
+    "Content-Type": "application/json",
+    "Content-Length": "138",
+    "Server": "Werkzeug/2.0.1 Python/3.13.1",
+    "Date": "Thu, 07 Aug 2025 10:52:14 GMT"
+  },
+  "response_body": "{\"data\":{\"from\":\"eve\",\"message\":\"This is a confidential message with password: MySecret123!\",\"to\":\"charlie\"},\"status\":\"Message received\"}\n",
+  "timestamp": "2025-08-07T16:22:14.766391"
+}
+,
+{
+  "method": "POST",
+  "path": "/send",
+  "request_headers": {
+    "Host": "localhost:8080",
+    "User-Agent": "python-requests/2.26.0",
+    "Accept-Encoding": "gzip, deflate",
+    "Accept": "*/*",
+    "Connection": "keep-alive",
+    "Content-Type": "application/json",
+    "Content-Length": "89"
+  },
+  "request_body": "{\"from\": \"dave\", \"to\": \"eve\", \"message\": \"This message will be intercepted by Burp-Lite\"}",
+  "response_code": 200,
+  "response_headers": {
+    "Content-Type": "application/json",
+    "Content-Length": "122",
+    "Server": "Werkzeug/2.0.1 Python/3.13.1",
+    "Date": "Thu, 07 Aug 2025 10:52:15 GMT"
+  },
+  "response_body": "{\"data\":{\"from\":\"dave\",\"message\":\"This message will be intercepted by Burp-Lite\",\"to\":\"eve\"},\"status\":\"Message received\"}\n",
+  "timestamp": "2025-08-07T16:22:15.282040"
+}
+,
+{
+  "method": "POST",
+  "path": "/send",
+  "request_headers": {
+    "Host": "localhost:8080",
+    "User-Agent": "python-requests/2.26.0",
+    "Accept-Encoding": "gzip, deflate",
+    "Accept": "*/*",
+    "Connection": "keep-alive",
+    "Content-Type": "application/json",
+    "Content-Length": "90"
+  },
+  "request_body": "{\"from\": \"alice\", \"to\": \"eve\", \"message\": \"This message will be intercepted by Burp-Lite\"}",
+  "response_code": 200,
+  "response_headers": {
+    "Content-Type": "application/json",
+    "Content-Length": "123",
+    "Server": "Werkzeug/2.0.1 Python/3.13.1",
+    "Date": "Thu, 07 Aug 2025 10:52:15 GMT"
+  },
+  "response_body": "{\"data\":{\"from\":\"alice\",\"message\":\"This message will be intercepted by Burp-Lite\",\"to\":\"eve\"},\"status\":\"Message received\"}\n",
+  "timestamp": "2025-08-07T16:22:15.803116"
+}
+,
+{
+  "method": "GET",
+  "path": "/inbox/alice",
+  "request_headers": {
+    "Host": "localhost:8080",
+    "User-Agent": "python-requests/2.26.0",
+    "Accept-Encoding": "gzip, deflate",
+    "Accept": "*/*",
+    "Connection": "keep-alive"
+  },
+  "request_body": null,
+  "response_code": 200,
+  "response_headers": {
+    "Content-Type": "application/json",
+    "Content-Length": "85",
+    "Server": "Werkzeug/2.0.1 Python/3.13.1",
+    "Date": "Thu, 07 Aug 2025 10:52:16 GMT"
+  },
+  "response_body": "{\"inbox\":[{\"from\":\"dave\",\"message\":\"Security testing in progress...\",\"to\":\"alice\"}]}\n",
+  "timestamp": "2025-08-07T16:22:16.312099"
+}
+,
+{
+  "method": "GET",
+  "path": "/inbox/bob",
+  "request_headers": {
+    "Host": "localhost:8080",
+    "User-Agent": "python-requests/2.26.0",
+    "Accept-Encoding": "gzip, deflate",
+    "Accept": "*/*",
+    "Connection": "keep-alive"
+  },
+  "request_body": null,
+  "response_code": 200,
+  "response_headers": {
+    "Content-Type": "application/json",
+    "Content-Length": "13",
+    "Server": "Werkzeug/2.0.1 Python/3.13.1",
+    "Date": "Thu, 07 Aug 2025 10:52:16 GMT"
+  },
+  "response_body": "{\"inbox\":[]}\n",
+  "timestamp": "2025-08-07T16:22:16.826729"
+}
+,
+{
+  "method": "GET",
+  "path": "/inbox/charlie",
+  "request_headers": {
+    "Host": "localhost:8080",
+    "User-Agent": "python-requests/2.26.0",
+    "Accept-Encoding": "gzip, deflate",
+    "Accept": "*/*",
+    "Connection": "keep-alive"
+  },
+  "request_body": null,
+  "response_code": 200,
+  "response_headers": {
+    "Content-Type": "application/json",
+    "Content-Length": "176",
+    "Server": "Werkzeug/2.0.1 Python/3.13.1",
+    "Date": "Thu, 07 Aug 2025 10:52:17 GMT"
+  },
+  "response_body": "{\"inbox\":[{\"from\":\"alice\",\"message\":\"How are you doing?\",\"to\":\"charlie\"},{\"from\":\"eve\",\"message\":\"This is a confidential message with password: MySecret123!\",\"to\":\"charlie\"}]}\n",
+  "timestamp": "2025-08-07T16:22:17.333650"
+}
+,
+{
+  "method": "GET",
+  "path": "/inbox/dave",
+  "request_headers": {
+    "Host": "localhost:8080",
+    "User-Agent": "python-requests/2.26.0",
+    "Accept-Encoding": "gzip, deflate",
+    "Accept": "*/*",
+    "Connection": "keep-alive"
+  },
+  "request_body": null,
+  "response_code": 200,
+  "response_headers": {
+    "Content-Type": "application/json",
+    "Content-Length": "70",
+    "Server": "Werkzeug/2.0.1 Python/3.13.1",
+    "Date": "Thu, 07 Aug 2025 10:52:17 GMT"
+  },
+  "response_body": "{\"inbox\":[{\"from\":\"eve\",\"message\":\"How are you doing?\",\"to\":\"dave\"}]}\n",
+  "timestamp": "2025-08-07T16:22:17.845614"
+}
+,
+{
+  "method": "GET",
+  "path": "/inbox/eve",
+  "request_headers": {
+    "Host": "localhost:8080",
+    "User-Agent": "python-requests/2.26.0",
+    "Accept-Encoding": "gzip, deflate",
+    "Accept": "*/*",
+    "Connection": "keep-alive"
+  },
+  "request_body": null,
+  "response_code": 200,
+  "response_headers": {
+    "Content-Type": "application/json",
+    "Content-Length": "501",
+    "Server": "Werkzeug/2.0.1 Python/3.13.1",
+    "Date": "Thu, 07 Aug 2025 10:52:18 GMT"
+  },
+  "response_body": "{\"inbox\":[{\"from\":\"charlie\",\"message\":\"This message will be intercepted by Burp-Lite\",\"to\":\"eve\"},{\"from\":\"bob\",\"message\":\"How are you doing?\",\"to\":\"eve\"},{\"from\":\"bob\",\"message\":\"API key for testing: sk_test_abcdef123456789\",\"to\":\"eve\"},{\"from\":\"dave\",\"message\":\"My credit card is 4111-1111-1111-1111 (not really)\",\"to\":\"eve\"},{\"from\":\"dave\",\"message\":\"This message will be intercepted by Burp-Lite\",\"to\":\"eve\"},{\"from\":\"alice\",\"message\":\"This message will be intercepted by Burp-Lite\",\"to\":\"eve\"}]}\n",
+  "timestamp": "2025-08-07T16:22:18.361810"
+}
+,
+{
+  "method": "POST",
+  "path": "/send",
+  "request_headers": {
+    "Host": "localhost:8080",
+    "User-Agent": "python-requests/2.26.0",
+    "Accept-Encoding": "gzip, deflate",
+    "Accept": "*/*",
+    "Connection": "keep-alive",
+    "Content-Type": "application/json",
+    "Content-Length": "16"
+  },
+  "request_body": "This is not JSON",
+  "response_code": 400,
+  "response_headers": {
+    "Content-Type": "text/html; charset=utf-8",
+    "Content-Length": "192",
+    "Server": "Werkzeug/2.0.1 Python/3.13.1",
+    "Date": "Thu, 07 Aug 2025 10:52:18 GMT"
+  },
+  "response_body": "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 3.2 Final//EN\">\n<title>400 Bad Request</title>\n<h1>Bad Request</h1>\n<p>The browser (or proxy) sent a request that this server could not understand.</p>\n",
+  "timestamp": "2025-08-07T16:22:18.872636"
+}
+,
+{
+  "method": "GET",
+  "path": "/not-found",
+  "request_headers": {
+    "Host": "localhost:8080",
+    "User-Agent": "python-requests/2.26.0",
+    "Accept-Encoding": "gzip, deflate",
+    "Accept": "*/*",
+    "Connection": "keep-alive"
+  },
+  "request_body": null,
+  "response_code": 404,
+  "response_headers": {
+    "Content-Type": "text/html; charset=utf-8",
+    "Content-Length": "232",
+    "Server": "Werkzeug/2.0.1 Python/3.13.1",
+    "Date": "Thu, 07 Aug 2025 10:52:18 GMT"
+  },
+  "response_body": "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 3.2 Final//EN\">\n<title>404 Not Found</title>\n<h1>Not Found</h1>\n<p>The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.</p>\n",
+  "timestamp": "2025-08-07T16:22:18.875795"
+}
 ]

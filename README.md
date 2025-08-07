@@ -48,6 +48,11 @@ Response back to client
 ## 🚀 Quick Start
 
 ```bash
+# Create and activate a virtual environment
+python3 -m venv venv
+source venv/bin/activate  # On macOS/Linux
+# Or on Windows: venv\Scripts\activate
+
 # Install dependencies
 pip install -r requirements.txt
 
@@ -101,19 +106,36 @@ git clone https://github.com/TShreek/Burp-Lite-with-Scanner.git
 cd Burp-Lite-with-Scanner
 ```
 
-### 2. Install dependencies
+### 2. Set up virtual environment
+```bash
+# Create a virtual environment
+python3 -m venv venv
+
+# Activate the virtual environment
+source venv/bin/activate  # On macOS/Linux
+# Or on Windows: venv\Scripts\activate
+```
+
+### 3. Install dependencies
 ```bash
 pip install -r requirements.txt
+# If you encounter dependency issues, try specifying versions:
+# pip install flask==2.0.1 werkzeug==2.0.1 requests==2.26.0
 ```
 
 ### 3. Start the Flask backend (in one terminal)
 ```bash
+# Make sure your virtual environment is activated
 python3 flask_app/app.py
 ```
 You should see a message indicating the Flask app is running on port 5000.
 
 ### 4. Start the proxy server (in another terminal)
 ```bash
+# Make sure your virtual environment is activated
+source venv/bin/activate  # On macOS/Linux
+# Or on Windows: venv\Scripts\activate
+
 python3 proxy/server.py
 ```
 This will start the proxy on port 8080 that forwards requests to the Flask app. The proxy:
@@ -124,6 +146,10 @@ This will start the proxy on port 8080 that forwards requests to the Flask app. 
 
 ### 5. Start the UI server (in a third terminal)
 ```bash
+# Make sure your virtual environment is activated
+source venv/bin/activate  # On macOS/Linux
+# Or on Windows: venv\Scripts\activate
+
 python3 ui/server.py
 ```
 The UI server will run on port 8081 by default.
@@ -138,6 +164,10 @@ You can either:
 
 A. Use the test client to simulate traffic:
 ```bash
+# Make sure your virtual environment is activated
+source venv/bin/activate  # On macOS/Linux
+# Or on Windows: venv\Scripts\activate
+
 python3 test_client/run_test.py
 ```
 
@@ -171,6 +201,10 @@ The UI server provides several API endpoints:
 ### 9. Run the scanner (optional)
 To analyze the captured traffic for security issues:
 ```bash
+# Make sure your virtual environment is activated
+source venv/bin/activate  # On macOS/Linux
+# Or on Windows: venv\Scripts\activate
+
 python3 scanner/passive.py
 ```
 The scanner results will also appear in the web dashboard for each request.
@@ -197,14 +231,23 @@ Burp-Lite-with-Scanner/
 
 - Python 3.7+
 - Flask 2.0.1
+- Werkzeug 2.0.1 (required for Flask 2.0.1)
 - Requests 2.26.0
-- Werkzeug 2.0.1
 
 ## 🛠️ Troubleshooting
 
-- **Flask Import Error**: If you encounter `ImportError: cannot import name 'url_quote'`, run:
+- **Flask Import Error**: If you encounter `ImportError: cannot import name 'url_quote'`:
   ```bash
   pip install werkzeug==2.0.1 flask==2.0.1
+  ```
+  
+- **Python Version Issues**: This project is designed for Python 3.7+. If you have multiple Python versions installed, make sure you're using the correct one:
+  ```bash
+  # Check your Python version
+  python3 --version
+  
+  # If needed, create a virtual environment with a specific Python version
+  python3.9 -m venv venv
   ```
 
 - **Empty Traffic Log**: If no traffic is being logged, ensure all components are running:

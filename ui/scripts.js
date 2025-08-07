@@ -6,6 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('loadTraffic').addEventListener('click', loadTrafficData);
     document.getElementById('searchBox').addEventListener('input', updateTrafficList);
     document.getElementById('clearTraffic').addEventListener('click', clearTrafficData);
+    document.getElementById('activeScanBtn').addEventListener('click', runActiveScan);
     
     // Automatically load traffic data when page loads
     loadTrafficData();
@@ -274,7 +275,8 @@ function formatBody(body) {
         return body;
     }
 }
-document.getElementById('activeScanBtn').addEventListener('click', () => {
+
+function runActiveScan() {
   const resultsContainer = document.getElementById('results');
   resultsContainer.innerHTML = '<p class="loading">🔍 Running Active Scan...</p>';
 
@@ -302,5 +304,5 @@ document.getElementById('activeScanBtn').addEventListener('click', () => {
     .catch(error => {
       resultsContainer.innerHTML = `<p class="error">⚠️ Error running active scan: ${error.message}</p>`;
     });
-});
+}
 

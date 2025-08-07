@@ -35,12 +35,60 @@ class UIHandler(http.server.SimpleHTTPRequestHandler):
         super().__init__(*args, directory=UI_DIR, **kwargs)
 
     def perform_active_scan(self):
-        from scanner.active import ActiveScanner
-
-        scanner = ActiveScanner()
-        results = scanner.scan(base_url="http://localhost:5000", method="GET", path="/send", headers={})
-        self.send_json_response({"findings": results})
-
+        """Run the active scanner against the target app"""
+        try:
+            # Import the scanner
+            sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+            from scanner.active import ActiveScanner
+            
+            # Read traffic file to get scan targets
+            targets = []
+            if os.path.exists(TRAFFIC_FILE):
+                with open(TRAFFIC_FILE, 'r') as f:
+                    try:
+                        traffic = json.load(f)
+                        if isinstance(traffic, list) and len(traffic) > 0:
+                            # Use first traffic item to get base URL
+                            targets.append({
+                                'base_url': 'http://localhost:5000',
+                                'method': traffic[0].get('method', 'GET'),
+                                'path': traffic[0].get('path', '/'),
+                                'headers': traffic[0].get('request_headers', {})
+                            })
+                    except json.JSONDecodeError:
+                        pass
+            
+            # Default target if no traffic
+            if not targets:
+                targets = [{
+                    'base_url': 'http://localhost:5000',
+                    'method': 'GET',
+                    'path': '/',
+                    'headers': {}
+                }]
+            
+            # Run active scan
+            scanner = ActiveScanner()
+            all_findings = []
+            
+            for target in targets:
+                findings = scanner.scan(
+                    base_url=target['base_url'],
+                    method=target['method'],
+                    path=target['path'],
+                    headers=target['headers']
+                )
+                all_findings.extend(findings)
+            
+            # Return results
+            self.send_json_response({"findings": all_findings})
+            
+        except Exception as e:
+            print(f"Error in active scan: {e}")
+            self.send_json_response({
+                "error": str(e),
+                "findings": []
+            })
     
     def do_GET(self):
         parsed_path = urlparse(self.path)

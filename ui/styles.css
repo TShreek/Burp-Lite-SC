@@ -261,3 +261,60 @@ pre {
 .clear-button:hover {
     background-color: var(--error);
 }
+
+/* Active Scan Results Styling */
+.scan-results {
+    margin-top: 20px;
+    padding: 15px;
+    background-color: var(--panel-bg);
+    border-radius: 4px;
+    grid-column: 1 / 3;
+}
+
+.scan-results h3 {
+    margin-top: 0;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 10px;
+    color: var(--accent-color);
+}
+
+#results {
+    padding: 10px;
+}
+
+.loading {
+    color: var(--warning);
+    font-style: italic;
+}
+
+.no-findings {
+    color: var(--success);
+}
+
+.error {
+    color: var(--error);
+}
+
+.severity {
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 0.8em;
+    font-weight: bold;
+    display: inline-block;
+    margin: 5px 0;
+}
+
+.severity.high {
+    background-color: var(--error);
+    color: white;
+}
+
+.severity.medium {
+    background-color: var(--warning);
+    color: black;
+}
+
+.severity.low {
+    background-color: var(--accent-color);
+    color: white;
+}

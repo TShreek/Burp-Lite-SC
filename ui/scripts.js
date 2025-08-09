@@ -6,13 +6,47 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('loadTraffic').addEventListener('click', loadTrafficData);
     document.getElementById('searchBox').addEventListener('input', updateTrafficList);
     document.getElementById('clearTraffic').addEventListener('click', clearTrafficData);
-    document.getElementById('activeScanBtn').addEventListener('click', runActiveScan);
     
     // Automatically load traffic data when page loads
     loadTrafficData();
     
     // Set up auto-refresh every 5 seconds
     setInterval(loadTrafficData, 5000);
+    
+    // Active Scan Button Handler with improved error handling
+    const activeBtn = document.getElementById('activeScanBtn');
+    const resultsContainer = document.getElementById('results');
+    if (activeBtn && resultsContainer) {
+        activeBtn.addEventListener('click', () => {
+            resultsContainer.innerHTML = '<p class="loading">🔍 Running Active Scan...</p>';
+            fetch('/api/active_scan')
+                .then(r => r.json())
+                .then(data => {
+                    resultsContainer.innerHTML = '';
+                    const findings = (data && data.findings) || [];
+                    if (!findings.length) {
+                        resultsContainer.innerHTML = '<p class="no-findings">✅ No issues found during active scan.</p>';
+                        return;
+                    }
+                    findings.forEach(f => {
+                        const div = document.createElement('div');
+                        div.className = 'finding';
+                        div.innerHTML = `
+                            <div class="finding-title">${f.title}
+                                <span class="finding-severity severity-${(f.severity||'Info').toLowerCase()}">${f.severity||'Info'}</span>
+                            </div>
+                            <p><em>${f.url||''}</em></p>
+                            <p>${f.description||''}</p>
+                            <p><strong>Remediation:</strong> ${f.remediation||''}</p>
+                        `;
+                        resultsContainer.appendChild(div);
+                    });
+                })
+                .catch(err => {
+                    resultsContainer.innerHTML = `<p class="error">⚠️ Error running active scan: ${err.message}</p>`;
+                });
+        });
+    }
 });
 
 // Tab switching logic
@@ -274,35 +308,5 @@ function formatBody(body) {
     } catch (e) {
         return body;
     }
-}
-
-function runActiveScan() {
-  const resultsContainer = document.getElementById('results');
-  resultsContainer.innerHTML = '<p class="loading">🔍 Running Active Scan...</p>';
-
-  fetch('/api/active_scan')
-    .then(response => response.json())
-    .then(data => {
-      resultsContainer.innerHTML = '';
-      if (data.findings && data.findings.length > 0) {
-        data.findings.forEach(finding => {
-          const div = document.createElement('div');
-          div.className = 'finding';
-          div.innerHTML = `
-            <strong>${finding.title}</strong><br/>
-            <span class="severity ${finding.severity.toLowerCase()}">${finding.severity}</span><br/>
-            <em>${finding.url}</em><br/>
-            <p>${finding.description}</p>
-            <code>${finding.remediation}</code>
-          `;
-          resultsContainer.appendChild(div);
-        });
-      } else {
-        resultsContainer.innerHTML = '<p class="no-findings">✅ No issues found during active scan.</p>';
-      }
-    })
-    .catch(error => {
-      resultsContainer.innerHTML = `<p class="error">⚠️ Error running active scan: ${error.message}</p>`;
-    });
 }
 

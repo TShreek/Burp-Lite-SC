@@ -65,6 +65,7 @@ class ProxyHandler(http.server.BaseHTTPRequestHandler):
             self.send_error(502, f"Proxy error: {e}")
 
     def log_to_file(self, method, path, headers, request_body, response):
+        import os, json, datetime
         log_entry = {
             "method": method,
             "path": path,
@@ -78,22 +79,20 @@ class ProxyHandler(http.server.BaseHTTPRequestHandler):
 
         os.makedirs(os.path.dirname(LOG_PATH), exist_ok=True)
 
-        # Initialize JSON file if it doesn't exist or is empty
-        if not os.path.exists(LOG_PATH) or os.path.getsize(LOG_PATH) == 0:
-            with open(LOG_PATH, 'w') as f:
-                f.write('[\n')
-                f.write(json.dumps(log_entry, indent=2))
-                f.write('\n]')
-        else:
-            # Read existing content, remove the closing bracket, add new entry
-            with open(LOG_PATH, 'r') as f:
-                content = f.read().rstrip().rstrip(']')
-            
-            with open(LOG_PATH, 'w') as f:
-                f.write(content)
-                f.write(',\n')
-                f.write(json.dumps(log_entry, indent=2))
-                f.write('\n]')
+        # Load existing array or start fresh
+        data = []
+        if os.path.exists(LOG_PATH) and os.path.getsize(LOG_PATH) > 0:
+            try:
+                with open(LOG_PATH, "r") as f:
+                    data = json.load(f)
+                if not isinstance(data, list):
+                    data = []
+            except json.JSONDecodeError:
+                data = []
+
+        data.append(log_entry)
+        with open(LOG_PATH, "w") as f:
+            json.dump(data, f, indent=2)
 
 def run():
     with socketserver.ThreadingTCPServer(("", PROXY_PORT), ProxyHandler) as httpd:

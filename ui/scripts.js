@@ -63,7 +63,7 @@ function loadTrafficData() {
     console.log('Loading traffic data...');
     document.getElementById('trafficItems').innerHTML = '<div class="no-data">Loading traffic data...</div>';
     
-    fetch('/logs/traffic.json')
+    fetch('/api/traffic')
         .then(response => {
             console.log('Response status:', response.status);
             if (!response.ok) throw new Error(`Failed to load traffic data (Status: ${response.status})`);
@@ -140,6 +140,11 @@ function updateTrafficList() {
             const trafficItem = document.createElement('div');
             trafficItem.className = 'traffic-item';
             trafficItem.dataset.index = index;
+            
+            // Store the entry ID in a data attribute if available
+            if (item.id) {
+                trafficItem.dataset.id = item.id;
+            }
 
             const methodClass = `method-${item.method}`;
             const statusClass = `status-${Math.floor(item.response_code / 100)}xx`;
@@ -156,7 +161,8 @@ function updateTrafficList() {
             }
 
             trafficItem.addEventListener('click', () => {
-                selectTraffic(index);
+                // Pass both index and ID to selectTraffic
+                selectTraffic(index, item.id);
             });
 
             trafficList.appendChild(trafficItem);
@@ -168,17 +174,57 @@ function updateTrafficList() {
     }
 }
 
-function selectTraffic(index) {
+function selectTraffic(index, id) {
+    // Clear previous selection
     document.querySelectorAll('.traffic-item.selected').forEach(item => {
         item.classList.remove('selected');
     });
 
+    // Highlight the selected item
     document.querySelector(`.traffic-item[data-index="${index}"]`).classList.add('selected');
-    selectedTraffic = trafficData[index];
-
-    updateRequestView();
-    updateResponseView();
-    updateFindingsView();
+    
+    // If an ID is provided, fetch the complete entry data by ID
+    if (id) {
+        // Show loading indicator
+        document.getElementById('requestView').innerHTML = '<div class="loading">Loading request details...</div>';
+        document.getElementById('responseView').innerHTML = '<div class="loading">Loading response details...</div>';
+        
+        fetch(`/api/db/entry?id=${id}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`Failed to load entry (Status: ${response.status})`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                // Check if the response contains an error
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+                
+                // Update the selected traffic with the full entry data
+                selectedTraffic = data;
+                
+                // Update all views with the complete data
+                updateRequestView();
+                updateResponseView();
+                updateFindingsView();
+            })
+            .catch(error => {
+                console.error('Error loading entry details:', error);
+                // If there's an error, fall back to using the array index
+                selectedTraffic = trafficData[index];
+                updateRequestView();
+                updateResponseView();
+                updateFindingsView();
+            });
+    } else {
+        // If no ID is provided, use the array index as before (fallback)
+        selectedTraffic = trafficData[index];
+        updateRequestView();
+        updateResponseView();
+        updateFindingsView();
+    }
 }
 
 function updateRequestView() {
@@ -192,9 +238,14 @@ function updateRequestView() {
     for (const [key, value] of Object.entries(selectedTraffic.request_headers)) {
         headersHTML += `<div><span class="header-name">${key}:</span> ${value}</div>`;
     }
+    
+    // Add ID display if available
+    const idDisplay = selectedTraffic.id ? 
+        `<div class="entry-id">ID: <span class="id-value">${selectedTraffic.id}</span></div>` : '';
 
     requestView.innerHTML = `
         <h3>${selectedTraffic.method} ${selectedTraffic.path}</h3>
+        ${idDisplay}
         <h4>Headers:</h4>
         <div class="headers">${headersHTML}</div>
         <h4>Body:</h4>
@@ -215,9 +266,19 @@ function updateResponseView() {
     }
 
     const statusClass = `status-${Math.floor(selectedTraffic.response_code / 100)}xx`;
+    
+    // Calculate response time if available
+    let responseTimeDisplay = '';
+    if (selectedTraffic.timestamp && selectedTraffic.response_timestamp) {
+        const requestTime = new Date(selectedTraffic.timestamp);
+        const responseTime = new Date(selectedTraffic.response_timestamp);
+        const elapsedMs = responseTime - requestTime;
+        responseTimeDisplay = `<div class="response-time">Response time: ${elapsedMs}ms</div>`;
+    }
 
     responseView.innerHTML = `
         <h3>Response <span class="status-code ${statusClass}">${selectedTraffic.response_code}</span></h3>
+        ${responseTimeDisplay}
         <h4>Headers:</h4>
         <div class="headers">${headersHTML}</div>
         <h4>Body:</h4>

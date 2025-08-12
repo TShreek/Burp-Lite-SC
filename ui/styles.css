@@ -318,3 +318,23 @@ pre {
     background-color: var(--accent-color);
     color: white;
 }
+/* Entry ID and Response Time Styling */
+.entry-id {
+    margin: 5px 0 15px 0;
+    font-size: 0.9em;
+    color: #999;
+}
+
+.id-value {
+    font-family: monospace;
+    background-color: rgba(0, 122, 204, 0.1);
+    padding: 2px 6px;
+    border-radius: 3px;
+    color: var(--accent-color);
+}
+
+.response-time {
+    margin: 5px 0 15px 0;
+    font-size: 0.9em;
+    color: #999;
+}

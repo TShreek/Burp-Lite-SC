@@ -98,6 +98,8 @@ class UIHandler(http.server.SimpleHTTPRequestHandler):
             self.serve_json_file(TRAFFIC_FILE)
         elif parsed_path.path == '/api/scan':
             self.serve_scan_results()
+        elif parsed_path.path == '/api/db/entry':
+            self.serve_entry_by_id(parsed_path)
         elif parsed_path.path == '/api/clear':
             self.clear_traffic_file()
         # Access to logs directory
@@ -113,6 +115,45 @@ class UIHandler(http.server.SimpleHTTPRequestHandler):
         else:
             # Default to serving files from UI directory
             super().do_GET()
+    
+    def serve_entry_by_id(self, parsed_path):
+        """Serve a specific traffic entry by its ID"""
+        # Parse query parameters to get the ID
+        query_params = parse_qs(parsed_path.query)
+        entry_id = query_params.get('id', [''])[0]
+        
+        if not entry_id:
+            self.send_json_response({"error": "No ID provided"})
+            return
+            
+        try:
+            # Read the traffic file
+            if not os.path.exists(TRAFFIC_FILE):
+                self.send_json_response({"error": "Traffic file not found"})
+                return
+                
+            with open(TRAFFIC_FILE, 'r') as f:
+                try:
+                    traffic_data = json.load(f)
+                except json.JSONDecodeError:
+                    self.send_json_response({"error": "Invalid traffic data format"})
+                    return
+            
+            # Find the entry with the matching ID
+            found_entry = None
+            for entry in traffic_data:
+                if entry.get('id') == entry_id:
+                    found_entry = entry
+                    break
+            
+            if found_entry:
+                self.send_json_response(found_entry)
+            else:
+                self.send_json_response({"error": f"No entry found with ID: {entry_id}"})
+                
+        except Exception as e:
+            print(f"Error serving entry by ID: {e}")
+            self.send_json_response({"error": str(e)})
     
     def serve_json_file(self, file_path):
         """Serve a JSON file with proper content type"""

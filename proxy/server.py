@@ -65,8 +65,9 @@ class ProxyHandler(http.server.BaseHTTPRequestHandler):
             self.send_error(502, f"Proxy error: {e}")
 
     def log_to_file(self, method, path, headers, request_body, response):
-        import os, json, datetime
+        import os, json, datetime, uuid
         log_entry = {
+            "id": str(uuid.uuid4()),  # Add unique ID for each entry
             "method": method,
             "path": path,
             "request_headers": dict(headers),

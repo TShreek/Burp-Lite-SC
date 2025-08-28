@@ -14,7 +14,11 @@ TARGET_PORT = 5000
 LOG_PATH = os.path.join(os.path.dirname(__file__), '..', 'logs', 'traffic.json')
 
 
+
 class ProxyHandler(http.server.BaseHTTPRequestHandler):
+    # Use a class-level session to persist cookies across all requests
+    session = requests.Session()
+
     def do_GET(self):
         self.handle_request()
 
@@ -36,14 +40,19 @@ class ProxyHandler(http.server.BaseHTTPRequestHandler):
         headers = dict(self.headers)
 
         try:
+            # Remove 'Host' header to let requests set it correctly
+            headers.pop('Host', None)
+
+            # Use the session to persist cookies
             if self.command == 'POST':
-                response = requests.post(target_url, data=body, headers=headers)
+                response = self.session.post(target_url, data=body, headers=headers)
             else:
-                response = requests.get(target_url, headers=headers)
+                response = self.session.get(target_url, headers=headers)
 
             # Log response
             print("[<] Response Code:", response.status_code)
             print("[<] Response Body:", response.text)
+            print("[<] Session Cookies:", self.session.cookies.get_dict())
             
             # Log the traffic to file
             self.log_to_file(self.command, self.path, headers, body, response)

@@ -92,65 +92,55 @@ class UIHandler(http.server.SimpleHTTPRequestHandler):
     
     def do_GET(self):
         parsed_path = urlparse(self.path)
-        
+
         # API endpoints
         if parsed_path.path == '/api/traffic':
             self.serve_json_file(TRAFFIC_FILE)
+            return
         elif parsed_path.path == '/api/scan':
             self.serve_scan_results()
+            return
         elif parsed_path.path == '/api/db/entry':
             self.serve_entry_by_id(parsed_path)
+            return
         elif parsed_path.path == '/api/clear':
             self.clear_traffic_file()
-        # Access to logs directory
+            return
         elif parsed_path.path.startswith('/logs/'):
             requested_file = os.path.join(
-                os.path.dirname(UI_DIR), 
-                parsed_path.path[1:]  # Remove leading slash
+                os.path.dirname(UI_DIR),
+                parsed_path.path[1:]
             )
             self.serve_file(requested_file)
+            return
         elif parsed_path.path == '/api/active_scan':
             self.perform_active_scan()
-
-        else:
-            # Default to serving files from UI directory
-            super().do_GET()
+            return
+        # Default to serving files from UI directory
+        super().do_GET()
     
     def serve_entry_by_id(self, parsed_path):
         """Serve a specific traffic entry by its ID"""
-        # Parse query parameters to get the ID
         query_params = parse_qs(parsed_path.query)
         entry_id = query_params.get('id', [''])[0]
-        
         if not entry_id:
             self.send_json_response({"error": "No ID provided"})
             return
-            
         try:
-            # Read the traffic file
             if not os.path.exists(TRAFFIC_FILE):
                 self.send_json_response({"error": "Traffic file not found"})
                 return
-                
             with open(TRAFFIC_FILE, 'r') as f:
                 try:
                     traffic_data = json.load(f)
-                except json.JSONDecodeError:
+                except Exception:
                     self.send_json_response({"error": "Invalid traffic data format"})
                     return
-            
-            # Find the entry with the matching ID
-            found_entry = None
             for entry in traffic_data:
                 if entry.get('id') == entry_id:
-                    found_entry = entry
-                    break
-            
-            if found_entry:
-                self.send_json_response(found_entry)
-            else:
-                self.send_json_response({"error": f"No entry found with ID: {entry_id}"})
-                
+                    self.send_json_response(entry)
+                    return
+            self.send_json_response({"error": f"No entry found with ID: {entry_id}"})
         except Exception as e:
             print(f"Error serving entry by ID: {e}")
             self.send_json_response({"error": str(e)})
@@ -191,19 +181,29 @@ class UIHandler(http.server.SimpleHTTPRequestHandler):
             self.send_error(500, str(e))
     
     def serve_file(self, file_path):
-        """Serve any file with appropriate content type"""
-        if not os.path.exists(file_path):
-            self.send_error(404, "File not found")
+        """Serve any file with appropriate content type, preventing path traversal."""
+        # Only allow serving files within UI_DIR or LOGS_DIR
+        allowed_dirs = [os.path.abspath(UI_DIR), os.path.abspath(LOGS_DIR)]
+        abs_file_path = os.path.abspath(file_path)
+        real_file_path = os.path.realpath(abs_file_path)
+        # Reject if the file is a symlink or resolves outside allowed dirs
+        if os.path.islink(abs_file_path):
+            self.send_error(403, "Forbidden: Symlinks are not allowed")
             return
-            
+        if not any(real_file_path.startswith(ad + os.sep) or real_file_path == ad for ad in allowed_dirs):
+            self.send_error(403, "Forbidden: Path traversal detected")
+            return
+        # Ensure the path is a file, not a directory, and exists
+        if not os.path.isfile(real_file_path):
+            self.send_error(404, "File not found or not a file")
+            return
         try:
-            with open(file_path, 'rb') as f:
+            # Only open if all checks pass
+            with open(real_file_path, 'rb') as f:
                 content = f.read()
-                
             self.send_response(200)
-            
             # Determine content type based on file extension
-            _, ext = os.path.splitext(file_path)
+            _, ext = os.path.splitext(real_file_path)
             content_type = {
                 '.json': 'application/json',
                 '.html': 'text/html',
@@ -214,7 +214,6 @@ class UIHandler(http.server.SimpleHTTPRequestHandler):
                 '.jpeg': 'image/jpeg',
                 '.gif': 'image/gif'
             }.get(ext.lower(), 'application/octet-stream')
-            
             self.send_header('Content-Type', content_type)
             self.send_header('Content-Length', str(len(content)))
             self.end_headers()

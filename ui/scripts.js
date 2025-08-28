@@ -47,6 +47,21 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
         });
     }
+
+    // Load session cookies
+    loadSessionCookies();
+
+    // Clear session cookies button handler
+    const clearBtn = document.getElementById('clearSessionCookies');
+    if (clearBtn) {
+        clearBtn.addEventListener('click', () => {
+            fetch('http://localhost:8080/api/session/cookies', { method: 'DELETE' })
+                .then(r => r.json())
+                .then(() => {
+                    loadSessionCookies();
+                });
+        });
+    }
 });
 
 // Tab switching logic
@@ -360,6 +375,45 @@ function updateFindingsView() {
     findingsHTML += '</div>';
     findingsView.innerHTML = findingsHTML;
 }
+
+// --- Session Cookie Management ---
+function loadSessionCookies() {
+    const container = document.getElementById('sessionCookies');
+    container.innerHTML = '<p>Loading session cookies...</p>';
+    fetch('http://localhost:8080/api/session/cookies')
+        .then(r => r.json())
+        .then(cookies => {
+            if (Object.keys(cookies).length === 0) {
+                container.innerHTML = '<p>No session cookies set.</p>';
+                return;
+            }
+            let html = '<ul class="cookie-list">';
+            for (const [k, v] of Object.entries(cookies)) {
+                html += `<li><span class="cookie-name">${k}</span>: <span class="cookie-value">${v}</span></li>`;
+            }
+            html += '</ul>';
+            container.innerHTML = html;
+        })
+        .catch(err => {
+            container.innerHTML = `<p class="error">Error loading cookies: ${err.message}</p>`;
+        });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    // ...existing code...
+    loadSessionCookies();
+    const clearBtn = document.getElementById('clearSessionCookies');
+    if (clearBtn) {
+        clearBtn.addEventListener('click', () => {
+            fetch('http://localhost:8080/api/session/cookies', { method: 'DELETE' })
+                .then(r => r.json())
+                .then(() => {
+                    loadSessionCookies();
+                });
+        });
+    }
+});
+// --- End Session Cookie Management ---
 
 function formatBody(body) {
     if (!body) return '<em>(empty)</em>';

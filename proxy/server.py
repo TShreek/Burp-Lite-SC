@@ -15,9 +15,32 @@ LOG_PATH = os.path.join(os.path.dirname(__file__), '..', 'logs', 'traffic.json')
 
 
 
+
 class ProxyHandler(http.server.BaseHTTPRequestHandler):
     # Use a class-level session to persist cookies across all requests
     session = requests.Session()
+
+    def do_GET(self):
+        if self.path == '/api/session/cookies':
+            # Return current session cookies as JSON
+            cookies = self.session.cookies.get_dict()
+            self.send_response(200)
+            self.send_header('Content-Type', 'application/json')
+            self.end_headers()
+            self.wfile.write(json.dumps(cookies).encode('utf-8'))
+            return
+        self.handle_request()
+
+    def do_DELETE(self):
+        if self.path == '/api/session/cookies':
+            # Clear all session cookies
+            self.session.cookies.clear()
+            self.send_response(200)
+            self.send_header('Content-Type', 'application/json')
+            self.end_headers()
+            self.wfile.write(json.dumps({'status': 'cleared'}).encode('utf-8'))
+            return
+        self.send_error(404, 'Not Found')
 
     def do_GET(self):
         self.handle_request()
